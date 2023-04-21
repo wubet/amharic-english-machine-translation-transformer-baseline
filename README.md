@@ -1,4 +1,4 @@
-# Amharic-English-machine-Translation-Transformer-Baseline
+# Amharic-English-Machine-Translation-Transformer-Baseline
 
 clone the " 
 amharic-english-machine-translation-baseline" repository.
@@ -43,4 +43,27 @@ cd..
 Execute the pre-process file
 ```buildoutcfg
 python pre-process.py
+```
+
+We need to transliterate the Gee'z character representation into latin character representation.
+
+For development or validation
+```buildoutcfg
+python tf-transformer/commons/create_transliteration.py \
+  --original_filenames=tf-transformer/unified-amharic-english-corpus/datasets/dev.am-en.base.am \
+  --transliterate_filenames=tf-transformer/unified-amharic-english-corpus/datasets/dev.am-en.transliteration.am \
+```
+
+For training
+```buildoutcfg
+python tf-transformer/commons/create_transliteration.py \
+  --original_filenames=tf-transformer/unified-amharic-english-corpus/datasets/train.am-en.base.am \
+  --transliterate_filenames=tf-transformer/unified-amharic-english-corpus/datasets/train.am-en.transliteration.am \
+```
+
+For testing
+```buildoutcfg
+python tf-transformer/commons/create_transliteration.py \
+  --original_filenames=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.base.am \
+  --transliterate_filenames=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.transliteration.am \
 ```
