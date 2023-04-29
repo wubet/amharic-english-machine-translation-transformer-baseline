@@ -17,7 +17,7 @@ Change the directory into the main repository.
 cd amharic-english-machine-translation-transformer-baseline
 ```
 Clone the "tf-transformer
-" repository that is a TensorFlow 2.x implementation of Transformer model (Attention is all you need) for Neural Machine Translation (NMT). Authored by Chao ji.
+" repository that is a TensorFlow 2.x implementation of Transformer model (Attention is all you need) for Neural Machine Translation (NMT) authored by Chao ji.
 
 using SSH command.
 ```buildoutcfg
@@ -66,4 +66,23 @@ For testing
 python tf-transformer/commons/create_transliteration.py \
   --original_filenames=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.base.am \
   --transliterate_filenames=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.transliteration.am \
+```
+
+Convert raw text files into TFRecord files by running
+```buildoutcfg
+python tf-transformer/commons/create_tfrecord_machine_translation.py \
+  --source_filenames=tf-transformer/unified-amharic-english-corpus/datasets/dev.am-en.transliteration.am \
+  --target_filenames=tf-transformer/unified-amharic-english-corpus/datasets/dev.am-en.base.am \
+  --output_dir=tf-transformer/tfrecord \
+  --vocab_name=tf-transformer/vocab
+```
+
+To train a model, run
+```buildoutcfg
+python tf-transformer/run_trainer.py \
+  --data_dir=tf-transformer/tfrecord \
+  --vocab_path=tf-transformer/vocab \
+  --model_dir=checkpoints 
+  --source_language=Amharic
+  --target_language=English
 ```
