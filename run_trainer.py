@@ -23,6 +23,10 @@ flags.DEFINE_string(
 flags.DEFINE_string(
     'model_dir', None, 'Path to the directory that checkpoint files will be '
                        'written to.')
+flags.DEFINE_string(
+    'source_language', None, 'specify the source language.')
+flags.DEFINE_string(
+    'target_language', None, 'specify the target language')
 
 flags.DEFINE_integer(
     'encoder_stack_size', 6, 'Num of layers in encoder stack.')

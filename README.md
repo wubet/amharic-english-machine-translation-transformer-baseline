@@ -16,6 +16,13 @@ Change the directory into the main repository.
 ```buildoutcfg
 cd amharic-english-machine-translation-transformer-baseline
 ```
+Clone the "unified-amharic-english-corpus" repository that contains Amharic-English dataset.
+
+using SSH command.
+```buildoutcfg
+git clone https://github.com/wubet/unified-amharic-english-corpus.git
+```
+
 Clone the "tf-transformer
 " repository that is a TensorFlow 2.x implementation of Transformer model (Attention is all you need) for Neural Machine Translation (NMT) authored by Chao ji.
 
@@ -37,7 +44,7 @@ git submodule update --init --recursive
 ```
 Return to main directory
 ```buildoutcfg
-cd..
+cd ..
 ```
 
 Execute the pre-process file
@@ -71,8 +78,8 @@ python tf-transformer/commons/create_transliteration.py \
 Convert raw text files into TFRecord files by running
 ```buildoutcfg
 python tf-transformer/commons/create_tfrecord_machine_translation.py \
-  --source_filenames=tf-transformer/unified-amharic-english-corpus/datasets/dev.am-en.transliteration.am \
-  --target_filenames=tf-transformer/unified-amharic-english-corpus/datasets/dev.am-en.base.am \
+  --source_filenames=tf-transformer/unified-amharic-english-corpus/datasets/train.am-en.transliteration.am \
+  --target_filenames=tf-transformer/unified-amharic-english-corpus/datasets/train.am-en.base.am \
   --output_dir=tf-transformer/tfrecord \
   --vocab_name=tf-transformer/vocab
 ```
@@ -82,7 +89,7 @@ To train a model, run
 python tf-transformer/run_trainer.py \
   --data_dir=tf-transformer/tfrecord \
   --vocab_path=tf-transformer/vocab \
-  --model_dir=checkpoints 
-  --source_language=Amharic
+  --model_dir=checkpoints \
+  --source_language=Amharic \
   --target_language=English
 ```

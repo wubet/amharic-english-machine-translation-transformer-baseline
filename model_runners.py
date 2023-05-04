@@ -30,6 +30,16 @@ class SequenceTransducerTrainer(object):
         """
         self._model = model
         self._label_smoothing = label_smoothing
+        self.train_accuracy = tf.keras.metrics.Mean(name='train_accuracy')
+
+    def accuracy_function(self, real, pred):
+        accuracies = tf.equal(real, pred)
+        mask = tf.math.logical_not(tf.math.equal(real, 0))
+        accuracies = tf.math.logical_and(mask, accuracies)
+        accuracies = tf.cast(accuracies, dtype=tf.float32)
+        mask = tf.cast(mask, dtype=tf.float32)
+        result = tf.reduce_sum(accuracies) / tf.reduce_sum(mask)
+        return result
 
     def train(self,
               dataset,
@@ -38,11 +48,12 @@ class SequenceTransducerTrainer(object):
               ckpt_path,
               num_iterations,
               persist_per_iterations,
+              source_language,
+              target_language,
               clip_norm=None,
               log_per_iterations=100,
               logdir='log',
-              source_language=None,
-              target_language=None):
+            ):
         """Performs training iterations.
 
         Args:
@@ -65,6 +76,13 @@ class SequenceTransducerTrainer(object):
             :param source_language:
             :param target_language:
         """
+        # Get the current working directory
+        current_dir = os.getcwd()
+
+        losses = []
+        accuracies = []
+        steps = []
+        learning_rate = []
         batch_size = dataset.element_spec[0].shape[0]
         train_step_signature = [
             tf.TensorSpec(shape=(batch_size, None), dtype=tf.int64),
@@ -88,6 +106,8 @@ class SequenceTransducerTrainer(object):
               step: int scalar tensor, the global step.
               lr: float scalar tensor, the learning rate.
             """
+            tar_real = tgt_token_ids
+
             with tf.GradientTape() as tape:
                 # for each sequence of subtokens s1, s2, ..., sn, 1
                 # prepend it with 0 (SOS_ID) and truncate it to the same length:
@@ -100,22 +120,32 @@ class SequenceTransducerTrainer(object):
                                     self._model._vocab_size)
 
             gradients = tape.gradient(loss, self._model.trainable_variables)
+            print("Clip_Norm", type(clip_norm))
             if clip_norm is not None:
                 gradients, norm = tf.clip_by_global_norm(gradients, clip_norm)
             optimizer.apply_gradients(
                 zip(gradients, self._model.trainable_variables))
 
             step = optimizer.iterations
-            lr = optimizer.learning_rate(step)
+            lr = optimizer.learning_rate
+
+            predictions = tf.argmax(logits, 2)
+            self.train_accuracy(self.accuracy_function(tar_real, predictions))
+
             return loss, step - 1, lr
+
+        output_path = os.path.join(current_dir, "tf-transformer/output")
+        isExist = os.path.exists(output_path)
+        if not isExist:
+            os.makedirs(output_path)
 
         summary_writer = tf.summary.create_file_writer(logdir)
 
         latest_ckpt = tf.train.latest_checkpoint(ckpt_path)
         if latest_ckpt:
-            file_path = Path("output/visualization_data.csv")
+            file_path = Path(os.path.join(current_dir, "tf-transformer/output/visualization_data.csv"))
             if file_path.is_file() and os.path.getsize(file_path) != 0:
-                df = pd.read_csv("output/visualization_data.csv")
+                df = pd.read_csv(os.path.join(current_dir, "tf-transformer/output/visualization_data.csv"))
                 steps = df['steps'].tolist()
                 losses = df['losses'].tolist()
                 accuracies = df['accuracies'].tolist()
@@ -135,7 +165,7 @@ class SequenceTransducerTrainer(object):
 
             if step.numpy() % log_per_iterations == 0:
                 data = {'steps': steps, 'losses': losses, 'accuracies': accuracies, 'learning_rate': learning_rate}
-                pd.DataFrame(data).to_csv("output/visualization_data.csv", mode='w')
+                pd.DataFrame(data).to_csv(os.path.join(current_dir, "tf-transformer/output/visualization_data.csv"), mode='w')
 
                 print('global step: %d, loss: %f, learning rate:' %
                       (step.numpy(), loss.numpy()), lr.numpy())
@@ -144,7 +174,7 @@ class SequenceTransducerTrainer(object):
                 ckpt.save(os.path.join(ckpt_path, 'transformer'))
 
             if step.numpy() == num_iterations:
-                f = open("output/visualization_data.csv", "w")
+                f = open(os.path.join(current_dir, "tf-transformer/output/visualization_data.csv"), "w")
                 f.truncate()
                 f.close()
                 break

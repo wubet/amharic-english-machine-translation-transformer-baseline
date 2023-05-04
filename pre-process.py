@@ -19,6 +19,9 @@ transformer_folder_name = "tf-transformer"
 # Specify the commons folder where you want to move
 commons_path = "tf-transformer/commons"
 
+# Specify the create tfRecord machine translation file you want to move
+create_tfrecord_file = "create_tfrecord_machine_translation.py"
+
 # Specify the transliteration file you want to move
 transliteration_file = "transliteration.py"
 
@@ -39,6 +42,9 @@ source = os.path.join(current_dir, datasets_folder_name);
 
 # Specify the destination directory
 destination = os.path.join(current_dir, transformer_folder_name)
+
+# Specify the create_tfRecord_machine_translation source directory
+source_create_tfRecord = os.path.join(current_dir, create_tfrecord_file)
 
 # Specify the transliteration source directory
 source_transliteration = os.path.join(current_dir, transliteration_file)
@@ -62,19 +68,22 @@ source_model_runners = os.path.join(current_dir, model_runners_file)
 # Move the datasets folder to the destination directory
 shutil.move(source, destination)
 
+# Move the create_tfRecord_machine_translation file into the destination
+os.replace(source_create_tfRecord, os.path.join(commons_path, create_tfrecord_file))
+
 # Move the transliteration file into the destination
 shutil.move(source_transliteration, commons_destination_dir)
 
-# Move the create_transliteration file into the destination
+# # Move the create_transliteration file into the destination
 shutil.move(source_create_transliteration, commons_destination_dir)
 
 # Move the run_trainer file into the destination
-shutil.move(source_run_trainer, transformer_folder_name)
+os.replace(source_run_trainer, os.path.join(destination, run_trainer_file))
 
 # Move the visualization file into the destination
 shutil.move(source_visualization, transformer_folder_name)
 
 # Move the model_runner file into the destination
-shutil.move(source_model_runners, transformer_folder_name)
+os.replace(source_model_runners, os.path.join(destination, model_runners_file))
 
 
