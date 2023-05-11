@@ -10,6 +10,8 @@ import pandas as pd
 import tensorflow as tf
 from nltk.translate.bleu_score import corpus_bleu
 from pathlib import Path
+
+from commons.transliteration import latin2ethiopic
 from utils import compute_loss
 from commons import utils
 from commons import tokenization
@@ -120,7 +122,6 @@ class SequenceTransducerTrainer(object):
                                     self._model._vocab_size)
 
             gradients = tape.gradient(loss, self._model.trainable_variables)
-            print("Clip_Norm", type(clip_norm))
             if clip_norm is not None:
                 gradients, norm = tf.clip_by_global_norm(gradients, clip_norm)
             optimizer.apply_gradients(
@@ -164,12 +165,18 @@ class SequenceTransducerTrainer(object):
                 tf.summary.scalar('learning_rate', lr, step=step)
 
             if step.numpy() % log_per_iterations == 0:
+                print('global step: %d, loss: %f, accuracy: %f, learning rate:' %
+                      (step.numpy(), loss.numpy(), self.train_accuracy.result()), lr.numpy())
+                steps.append(step.numpy())
+                losses.append(loss.numpy())
+                accuracies.append(tf.keras.backend.get_value(self.train_accuracy.result()))
+                learning_rate.append(lr.numpy())
+
+            if step.numpy() % persist_per_iterations == 0:
+
                 data = {'steps': steps, 'losses': losses, 'accuracies': accuracies, 'learning_rate': learning_rate}
                 pd.DataFrame(data).to_csv(os.path.join(current_dir, "tf-transformer/output/visualization_data.csv"), mode='w')
 
-                print('global step: %d, loss: %f, learning rate:' %
-                      (step.numpy(), loss.numpy()), lr.numpy())
-            if step.numpy() % persist_per_iterations == 0:
                 print('Saving checkpoint at global step %d ...' % step.numpy())
                 ckpt.save(os.path.join(ckpt_path, 'transformer'))
 
@@ -200,7 +207,12 @@ class SequenceTransducerEvaluator(object):
         self._src_max_length = src_max_length
         self._bleu_tokenizer = tokenization.BleuTokenizer()
 
-    def translate(self, source_text_filename, output_filename=None):
+    def latin_to_ethiopic(self, line):
+        if len(line) > 2:
+            record = latin2ethiopic(line)
+        return record
+
+    def translate(self, source_text_filename, is_target_language_amharic=False, output_filename=None):
         """Translates the source sequences.
 
         Args:
@@ -212,7 +224,19 @@ class SequenceTransducerEvaluator(object):
         Returns:
           translations: a list of strings, the translated sequences.
           sorted_indices: a list of ints, used to reorder the translated sequences.
+          :param output_filename:
+          :param source_text_filename:
+          :param is_target_language_amharic:
         """
+        # Get the current working directory
+        current_dir = os.getcwd()
+        if output_filename is not None:
+            output_file_path = os.path.join(current_dir, output_filename)
+
+        if output_filename is not None and is_target_language_amharic is None:
+            raise ValueError("Value of 'is_target_language_amharic' must be passed if value of 'output_filename' is "
+                             "passed")
+
         sorted_lines, sorted_indices = _get_sorted_lines(source_text_filename)
 
         total_samples = len(sorted_lines)
@@ -223,6 +247,7 @@ class SequenceTransducerEvaluator(object):
             # encodes each line into a list of subtoken ids (ending with EOS_ID) and
             # zero-pads or truncated to length `src_max_length`, and finally batches
             # to shape [batch_size, src_max_length]
+
             for i in range(num_decode_batches):
                 lines = [sorted_lines[j + i * batch_size]
                          for j in range(batch_size)
@@ -236,6 +261,7 @@ class SequenceTransducerEvaluator(object):
                 yield batch
 
         translations = []
+        re_transliteration = []
         for i, source_ids in enumerate(input_generator()):
             # transduces `source_ids` into `translated_ids`, trims token ids at and
             # beyond EOS, and decode token ids back to text
@@ -257,10 +283,14 @@ class SequenceTransducerEvaluator(object):
             for j in range(length):
                 translation = self._trim_and_decode(translated_ids[j])
                 translations.append(translation)
+                if is_target_language_amharic:
+                    re_transliteration.append(latin2ethiopic(translation))
 
         # optionally write translations to a text file
-        if output_filename is not None:
-            _write_translations(output_filename, sorted_indices, translations)
+        if output_filename is not None and not is_target_language_amharic:
+            _write_translations(output_file_path, sorted_indices, translations)
+        elif output_filename is not None and is_target_language_amharic:
+            _write_translations(output_file_path, sorted_indices, re_transliteration)
         return translations, sorted_indices
 
     def evaluate(self,
@@ -284,6 +314,7 @@ class SequenceTransducerEvaluator(object):
           case_sensitive_score: float scalar, BLEU score when all chars are in
             original case.
         """
+
         translations, sorted_indices = self.translate(
             source_text_filename, output_filename)
 

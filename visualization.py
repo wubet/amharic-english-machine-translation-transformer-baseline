@@ -5,13 +5,24 @@ import matplotlib.pyplot as plt
 # Get the current working directory
 current_dir = os.getcwd()
 
+
 def visualize_learningrate(steps, learning_rate, source_language, target_language, model_name):
+    """
+    :param steps:
+    :param learning_rate:
+    :param source_language:
+    :param target_language:
+    :param model_name:
+    :return:
+    """
+    learning_rate_path = 'tf-transformer/output/temp_learning_rate'
+
     plt.plot(steps, learning_rate)
     plt.title(source_language + " to " + target_language + " " + model_name + " Learning Rate")
     plt.ylabel("Learning Rate")
     plt.xlabel("Train Step")
     # plt.show()
-    plt.savefig('output/temp_learning_rate')
+    plt.savefig(os.path.join(current_dir, learning_rate_path))
 
 
 def visualize_transformer_training(epoch, accuracies, losses, source_language, target_language, model_name):

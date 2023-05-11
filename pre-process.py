@@ -1,12 +1,6 @@
 import os
 import shutil
 
-# Clone a Git project
-os.system("git clone https://github.com/wubet/unified-amharic-english-corpus.git")
-
-# Move the downloaded file to a specified directory
-# shutil.move("<filename>", "/path/to/directory/")
-
 # Get the current working directory
 current_dir = os.getcwd()
 
@@ -37,6 +31,9 @@ visualization_file = "visualization.py"
 # Specify the model_runners file you want to move
 model_runners_file = "model_runners.py"
 
+# Specify the run_evaluator file you want to move
+run_evaluator_file = "run_evaluator.py"
+
 # Specify the datasets source directory
 source = os.path.join(current_dir, datasets_folder_name);
 
@@ -64,6 +61,9 @@ source_visualization = os.path.join(current_dir, visualization_file)
 # Specify the model_runners source directory
 source_model_runners = os.path.join(current_dir, model_runners_file)
 
+# Specify the run_evaluator source directory
+source_run_evaluator = os.path.join(current_dir, run_evaluator_file)
+
 
 # Move the datasets folder to the destination directory
 shutil.move(source, destination)
@@ -86,4 +86,5 @@ shutil.move(source_visualization, transformer_folder_name)
 # Move the model_runner file into the destination
 os.replace(source_model_runners, os.path.join(destination, model_runners_file))
 
-
+# Move the run_evaluator file into the destination
+os.replace(source_run_evaluator, os.path.join(destination, run_trainer_file))
