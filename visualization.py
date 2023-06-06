@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 # Get the current working directory
 current_dir = os.getcwd()
 
-
 def visualize_learningrate(steps, learning_rate, source_language, target_language, model_name):
     """
     :param steps:

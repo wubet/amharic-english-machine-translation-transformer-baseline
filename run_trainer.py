@@ -104,7 +104,8 @@ def main(_):
     # find root directory
     base_path = os.path.abspath(os.getcwd())
     vocab_path = os.path.join(base_path, vocab_path)
-
+    data_dir = os.path.join(base_path, data_dir)
+    model_dir = os.path.join(base_path, model_dir)
     # transformer model
     subtokenizer = tokenization.restore_subtokenizer_from_vocab_files(os.path.join(vocab_path, "vocab"))
     vocab_size = subtokenizer.vocab_size

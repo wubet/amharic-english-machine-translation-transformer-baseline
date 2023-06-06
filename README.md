@@ -6,11 +6,11 @@ amharic-english-machine-translation-baseline" repository.
 using SSH command.
 
 ```buildoutcfg
-git clone git@github.com:wubet/amharic-english-machine-translation-baseline.git
+git clone git@github.com:wubet/amharic-english-machine-translation-transformer-baseline.git
 ```
 Or using the https command
 ```buildoutcfg
-git clone https://github.com/wubet/amharic-english-machine-translation-baseline.git
+git clone https://github.com/wubet/amharic-english-machine-translation-transformer-baseline.git
 ```
 Change the directory into the main repository.
 ```buildoutcfg
@@ -103,6 +103,7 @@ To evaluate the model, run
 python tf-transformer/run_evaluator.py \
   --source_text_filename=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.transliteration.am \
   --target_text_filename=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.base.en \
+  --is_target_language_amharic=False \
   --vocab_path=tf-transformer/vocab/vocab \
   --model_dir=checkpoints 
 ```
