@@ -9,17 +9,16 @@ from os import path
 from transliteration import ethiopic2latin
 from absl import app
 
-# coding:gbk
+#coding:gbk
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_list(
     'original_filenames', None, 'Names of files storing original language '
-                                'sequences.')
+        'sequences.')
 flags.DEFINE_list(
     'transliterate_filenames', None, 'Names of files storing language transliteration'
-                                     'sequences.')
-
+        'sequences.')
 
 def transliterate_text(original_file_path, transliterate_file_path):
     txt = ''
@@ -38,26 +37,27 @@ def transliterate_text(original_file_path, transliterate_file_path):
 
 
 def main(_):
-    original_filenames = FLAGS.original_filenames
-    transliterate_filenames = FLAGS.transliterate_filenames
+  original_filenames = FLAGS.original_filenames
+  transliterate_filenames = FLAGS.transliterate_filenames
 
-    base_path = os.path.abspath(os.getcwd())
+  base_path = os.path.abspath(os.getcwd())
 
-    original_file_path = base_path + '/' + original_filenames[0]
-    transliterate_file_path = base_path + '/' + transliterate_filenames[0]
+  # original_file_path = base_path + '/' + original_filenames[0]
+  original_file_path = os.path.join(base_path, original_filenames[0])
+  # transliterate_file_path = base_path + '/' + transliterate_filenames[0]
+  transliterate_file_path = os.path.join(base_path, transliterate_filenames[0])
 
-    if not path.exists(transliterate_file_path) or os.path.getsize(transliterate_file_path) == 0:
-        if path.exists(transliterate_file_path):
-            f = open(transliterate_file_path, 'r+')
-            f.truncate(0);
-            f.close();
-        transliterate_text(original_file_path, transliterate_file_path)
-
+  if not path.exists(transliterate_file_path) or os.path.getsize(transliterate_file_path) == 0:
+      if path.exists(transliterate_file_path):
+          f = open(transliterate_file_path, 'r+')
+          f.truncate(0);
+          f.close();
+      transliterate_text(original_file_path, transliterate_file_path)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    flags.mark_flag_as_required('original_filenames');
-    flags.mark_flag_as_required('transliterate_filenames');
-    app.run(main);
+  flags.mark_flag_as_required('original_filenames');
+  flags.mark_flag_as_required('transliterate_filenames');
+  app.run(main);
 
 

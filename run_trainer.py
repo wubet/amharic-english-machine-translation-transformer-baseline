@@ -33,7 +33,7 @@ flags.DEFINE_integer(
 flags.DEFINE_integer(
     'decoder_stack_size', 6, 'Num of layers in decoder stack.')
 flags.DEFINE_integer(
-    'hidden_size', 512, 'The dimensionality of the embedding vector.')
+    'hidden_size', 768, 'The dimensionality of the embedding vector.')
 flags.DEFINE_integer(
     'num_heads', 8, 'Num of attention heads.')
 flags.DEFINE_integer(
@@ -101,11 +101,6 @@ def main(_):
     num_steps = FLAGS.num_steps
     save_ckpt_per_steps = FLAGS.save_ckpt_per_steps
 
-    # find root directory
-    base_path = os.path.abspath(os.getcwd())
-    vocab_path = os.path.join(base_path, vocab_path)
-    data_dir = os.path.join(base_path, data_dir)
-    model_dir = os.path.join(base_path, model_dir)
     # transformer model
     subtokenizer = tokenization.restore_subtokenizer_from_vocab_files(os.path.join(vocab_path, "vocab"))
     vocab_size = subtokenizer.vocab_size

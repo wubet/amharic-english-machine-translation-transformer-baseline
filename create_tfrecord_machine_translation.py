@@ -65,10 +65,13 @@ def main(_):
   use_exist_vocab = FLAGS.use_exist_vocab
   add_eos = FLAGS.add_eos
 
-  train_files_flat = source_filenames + target_filenames
   base_path = os.path.abspath(os.getcwd())
-  vocab_name = os.path.join(base_path, vocab_name)
-  output_dir = os.path.join(base_path, output_dir)
+  parent_directory = os.path.dirname(base_path)
+  vocab_name = os.path.join(parent_directory, vocab_name)
+  output_dir = os.path.join(parent_directory, output_dir)
+  source_filenames = [os.path.join(parent_directory, filename) for filename in source_filenames]
+  target_filenames = [os.path.join(parent_directory, filename) for filename in target_filenames]
+  train_files_flat = source_filenames + target_filenames
 
   isExist = os.path.exists(vocab_name)
   if not isExist:

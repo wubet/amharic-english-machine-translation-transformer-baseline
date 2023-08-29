@@ -135,7 +135,7 @@ class SequenceTransducerTrainer(object):
 
             return loss, step - 1, lr
 
-        output_path = os.path.join(current_dir, "tf-transformer/output")
+        output_path = os.path.join(current_dir, "output")
         isExist = os.path.exists(output_path)
         if not isExist:
             os.makedirs(output_path)
@@ -144,9 +144,9 @@ class SequenceTransducerTrainer(object):
 
         latest_ckpt = tf.train.latest_checkpoint(ckpt_path)
         if latest_ckpt:
-            file_path = Path(os.path.join(current_dir, "tf-transformer/output/visualization_data.csv"))
+            file_path = Path(os.path.join(current_dir, "output/visualization_data.csv"))
             if file_path.is_file() and os.path.getsize(file_path) != 0:
-                df = pd.read_csv(os.path.join(current_dir, "tf-transformer/output/visualization_data.csv"))
+                df = pd.read_csv(os.path.join(current_dir, "output/visualization_data.csv"))
                 steps = df['steps'].tolist()
                 losses = df['losses'].tolist()
                 accuracies = df['accuracies'].tolist()
@@ -175,19 +175,19 @@ class SequenceTransducerTrainer(object):
             if step.numpy() % persist_per_iterations == 0:
 
                 data = {'steps': steps, 'losses': losses, 'accuracies': accuracies, 'learning_rate': learning_rate}
-                pd.DataFrame(data).to_csv(os.path.join(current_dir, "tf-transformer/output/visualization_data.csv"), mode='w')
+                pd.DataFrame(data).to_csv(os.path.join(current_dir, "output/visualization_data.csv"), mode='w')
 
                 print('Saving checkpoint at global step %d ...' % step.numpy())
                 ckpt.save(os.path.join(ckpt_path, 'transformer'))
 
             if step.numpy() == num_iterations:
-                f = open(os.path.join(current_dir, "tf-transformer/output/visualization_data.csv"), "w")
+                f = open(os.path.join(current_dir, "output/visualization_data.csv"), "w")
                 f.truncate()
                 f.close()
                 break
 
-        visualize_transformer_training(steps, accuracies, losses, source_language, target_language, 'Transformer Training')
-        visualize_learningrate(steps, learning_rate, source_language, target_language, 'Transformer Training')
+        visualize_transformer_training(steps, accuracies, losses, source_language, target_language, 'Transformer_Model')
+        visualize_learningrate(steps, learning_rate, source_language, target_language, 'Transformer_Model')
 
 class SequenceTransducerEvaluator(object):
     """Evaluates a sequence transducer model."""
