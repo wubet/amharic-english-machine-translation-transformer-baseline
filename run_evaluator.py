@@ -17,7 +17,7 @@ flags.DEFINE_integer(
 flags.DEFINE_integer(
     'decoder_stack_size', 6, 'Num of layers in decoder stack.')
 flags.DEFINE_integer(
-    'hidden_size', 512, 'The dimensionality of the embedding vector.')
+    'hidden_size', 768, 'The dimensionality of the embedding vector.')
 flags.DEFINE_integer(
     'num_heads', 8, 'Num of attention heads.')
 flags.DEFINE_integer(

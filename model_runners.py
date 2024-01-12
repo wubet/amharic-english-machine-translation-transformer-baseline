@@ -55,7 +55,7 @@ class SequenceTransducerTrainer(object):
               clip_norm=None,
               log_per_iterations=100,
               logdir='log',
-            ):
+              ):
         """Performs training iterations.
 
         Args:
@@ -173,7 +173,6 @@ class SequenceTransducerTrainer(object):
                 learning_rate.append(lr.numpy())
 
             if step.numpy() % persist_per_iterations == 0:
-
                 data = {'steps': steps, 'losses': losses, 'accuracies': accuracies, 'learning_rate': learning_rate}
                 pd.DataFrame(data).to_csv(os.path.join(current_dir, "output/visualization_data.csv"), mode='w')
 
@@ -184,10 +183,14 @@ class SequenceTransducerTrainer(object):
                 f = open(os.path.join(current_dir, "output/visualization_data.csv"), "w")
                 f.truncate()
                 f.close()
+                # Save the model
+                model_save_path = os.path.join(current_dir, 'output/saved_base_model')
+                tf.saved_model.save(self._model, model_save_path)
                 break
 
         visualize_transformer_training(steps, accuracies, losses, source_language, target_language, 'Transformer_Model')
         visualize_learningrate(steps, learning_rate, source_language, target_language, 'Transformer_Model')
+
 
 class SequenceTransducerEvaluator(object):
     """Evaluates a sequence transducer model."""
