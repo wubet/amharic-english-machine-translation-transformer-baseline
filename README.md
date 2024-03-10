@@ -56,28 +56,28 @@ We need to transliterate the Gee'z character representation into latin character
 
 For development or validation
 ```buildoutcfg
-python tf-transformer/commons/create_transliteration.py \
+python3 tf-transformer/commons/create_transliteration.py \
   --original_filenames=tf-transformer/unified-amharic-english-corpus/datasets/dev.am-en.base.am \
   --transliterate_filenames=tf-transformer/unified-amharic-english-corpus/datasets/dev.am-en.transliteration.am \
 ```
 
 For training
 ```buildoutcfg
-python tf-transformer/commons/create_transliteration.py \
+python3 tf-transformer/commons/create_transliteration.py \
   --original_filenames=tf-transformer/unified-amharic-english-corpus/datasets/train.am-en.base.am \
   --transliterate_filenames=tf-transformer/unified-amharic-english-corpus/datasets/train.am-en.transliteration.am \
 ```
 
 For testing
 ```buildoutcfg
-python tf-transformer/commons/create_transliteration.py \
+python3 tf-transformer/commons/create_transliteration.py \
   --original_filenames=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.base.am \
   --transliterate_filenames=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.transliteration.am \
 ```
 
 Convert raw text files into TFRecord files by running
 ```buildoutcfg
-python tf-transformer/commons/create_tfrecord_machine_translation.py \
+python3 tf-transformer/commons/create_tfrecord_machine_translation.py \
   --source_filenames=tf-transformer/unified-amharic-english-corpus/datasets/train.am-en.transliteration.am \
   --target_filenames=tf-transformer/unified-amharic-english-corpus/datasets/train.am-en.base.en \
   --output_dir=tf-transformer/tfrecord \
@@ -88,7 +88,7 @@ In the context of machine translation, TFRecord files are a binary file format u
 
 To train a model, run
 ```buildoutcfg
-python tf-transformer/run_trainer.py \
+python3 tf-transformer/run_trainer.py \
   --data_dir=tf-transformer/tfrecord \
   --vocab_path=tf-transformer/vocab \
   --model_dir=checkpoints \
@@ -100,7 +100,7 @@ A vocab file is a text file that contains the vocabulary of the source or target
 
 To evaluate the model, run
 ```buildoutcfg
-python tf-transformer/run_evaluator.py \
+python3 tf-transformer/run_evaluator.py \
   --source_text_filename=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.transliteration.am \
   --target_text_filename=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.base.en \
   --is_target_language_amharic=False \
@@ -111,7 +111,7 @@ The model evaluation is made using BLUE (Bilingual Evaluation Understudy) score.
 
 To translate the source file, run
 ```buildoutcfg
-python tf-transformer/run_evaluator.py \
+python3 tf-transformer/run_evaluator.py \
   --source_text_filename=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.transliteration.am \
   --translation_output_filename=tf-transformer/unified-amharic-english-corpus/datasets/test.am-en.translated.en \
   --is_target_language_amharic=False \
